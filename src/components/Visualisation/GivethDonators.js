@@ -1,15 +1,20 @@
 import React from 'react';
 import * as d3 from 'd3';
+import {navigate} from 'gatsby';
 
-const GivethDonators = ({ donationData }) => {
+const DAI = "DAI";
+const ETH = "ETH";
+const DAI_TO_ETH = 150;
+
+const GivethDonators = ({ donations }) => {
   React.useEffect(() => {
     console.log('Mounted');
     createNodesAndLinks();
   }, []);
 
   const getTokenName = (tokenAddress) => {
-    if (tokenAddress === "0x0000000000000000000000000000000000000000") return 'ETH';
-    else return 'DAI';
+    if (tokenAddress === "0x0000000000000000000000000000000000000000") return ETH;
+    else return DAI;
   };
 
   const createNodesAndLinks = () => {
@@ -18,51 +23,108 @@ const GivethDonators = ({ donationData }) => {
     let links = [];
     let runningTotal = 0;
 
-    donationData.map(donation => {
+    donations.map(donation => {
       if (!includedGiverIds.includes(donation.giverId)) {
         nodes.push({
           id: donation.giverId,
+          donationsReceived: [],
+          donationsGiven: updateDonationsArray([], donation),
           isGiver: true,
-          amount: convertToEth(donation.amount)
         });
         includedGiverIds.push(donation.giverId);
       } else {
         nodes.forEach(node => {
           if (node.id === donation.giverId) {
-            node.amount = convertToEth(donation.amount);
+            console.log("Node Exists", node);
+            node.donationsGiven = updateDonationsArray(node.donationsGiven, donation)
           }
         });
       }
       if (!includedGiverIds.includes(donation.receiverId)) {
         nodes.push({
           id: donation.receiverId,
+          donationsReceived: updateDonationsArray([], donation),
+          donationsGiven: [],
           isGiver: false,
-          amount: convertToEth(donation.amount)
         });
         includedGiverIds.push(donation.receiverId);
       } else {
         nodes.forEach(node => {
           if (node.id === donation.receiverId) {
-            node.amount = convertToEth(donation.amount);
+            node.donationsReceived = updateDonationsArray(node.donationsReceived, donation)
           }
         });
       }
-      links.push({
+      let link = {
         source: donation.giverId,
         target: donation.receiverId,
-        amount:donation.amount / (10 ** 18),
-        tokenName: getTokenName(donation.token)
-    });
-      runningTotal += convertToEth(donation.amount);
+        donationData: getDonationData(donation)
+      }
+      links.push(link);
+      runningTotal += getRelativeDaiValue(link.donationData);
       return donation;
     });
-
+    console.log(nodes)
+    console.log(links)
     drawChart(nodes, links, runningTotal);
     console.log(runningTotal);
   };
 
-  const convertToEth = (amount) => {
+  const getRelativeDaiValue = (donationData) => {
+    return donationData.tokenName === ETH ? DAI_TO_ETH * donationData.amount : donationData.amount
+  }
+
+  const convertTokenValue = (amount) => {
     return amount / (10 ** 18)
+  }
+
+  const updateDonationsArray = (donationsArray, donation) => {
+    if (donationsArray.length === 0) {
+      return [getDonationData(donation)]
+    } else {
+      let newDonationData = getDonationData(donation);
+
+      let isNewToken = true;
+      isNewToken = donationsArray.find((donationData, index) => {
+        if (donationData.tokenName === newDonationData.tokenName) {
+          console.log("Updated donations array", donationData, newDonationData)
+          donationsArray[index] = {
+            tokenName: donationData.tokenName,
+            amount: (donationData.amount + newDonationData.amount)
+          }
+          console.log("Updated", donationsArray[index])
+          return false
+        }
+      });
+      if (isNewToken) {
+        console.log("Add New Token to List")
+        donationsArray.push(newDonationData)
+      }
+      return donationsArray
+    }
+  }
+
+  const getDonationData = (donation) => {
+    let tokenName = getTokenName(donation.token);
+    let amount = convertTokenValue(donation.amount)
+    return {
+      tokenName,
+      amount
+    }
+  }
+
+  const calculateDaiDonationsValue = (donationsArray) => {
+    let totalDaiValue = 0
+    if (donationsArray.length !== 0) {
+      totalDaiValue = donationsArray.reduce((total, donationData) => {
+        return total + getRelativeDaiValue(donationData)
+      }, 0)
+    }
+    return totalDaiValue
+  }
+
+  const calculateProportionDonatedRelativeToTotal = (donationData, donationTotal) => {
+    return donationData.tokenName === ETH ? donationData.amount * DAI_TO_ETH / donationTotal : donationData / donationTotal
   }
 
   const drawChart = (nodes, links, donationTotal) => {
@@ -129,10 +191,10 @@ const GivethDonators = ({ donationData }) => {
       .append('svg:marker') // This section adds in the arrows
       .attr('id', String)
       .attr('viewBox', '0 -5 10 10')
-      .attr('refX', 20)
+      .attr('refX', 25)
       .attr('refY', 0)
-      .attr('markerWidth', 50)
-      .attr('markerHeight', 15)
+      .attr('markerWidth', 40)
+      .attr('markerHeight', 10)
       .attr('markerUnits', 'strokeWidth')
       .attr('orient', 'auto')
       .append('svg:path')
@@ -152,7 +214,10 @@ const GivethDonators = ({ donationData }) => {
       .enter()
       .append('line')
       .attr('stroke-width', function(d) {
-        const strokeWidth = (d.amount / donationTotal) * 250;
+        let daiDonated = getRelativeDaiValue(d.donationData);
+        let proportion = daiDonated / donationTotal
+
+        const strokeWidth = proportion * 200;
 
         return strokeWidth > 2 ? strokeWidth : 2;
       })
@@ -161,7 +226,7 @@ const GivethDonators = ({ donationData }) => {
               div.transition()
                   .duration(200)
                   .style("opacity", .9);
-              div.html(d.amount + " " + d.tokenName)
+              div.html(d.donationData.amount + " " + d.donationData.tokenName)
                   .style("left", (d3.event.pageX) + "px")
                   .style("top", (d3.event.pageY - 28) + "px");
           })
@@ -203,20 +268,51 @@ const GivethDonators = ({ donationData }) => {
       .attr('r', d => {
         // console.log(donationTotal)
         // console.log(d.amount / 10**18 )
-        let proportion = d.amount / donationTotal;
-        // if (proportion > 1) console.log("ERROR")
-/*        console.log(
-          'Proportion',
-          d.amount,
-          proportion,
-          d.id,
-          'Total',
-          20 + 0 * proportion * 100
-        );
-*/
-        return 20 + 3000 * proportion;
+        let daiDonatedAndReceived = calculateDaiDonationsValue(d.donationsGiven) + calculateDaiDonationsValue(d.donationsReceived)
+        let proportion = daiDonatedAndReceived / donationTotal
+
+        return 20 + 500 * proportion;
       })
-      .attr('fill', d => (d.isGiver ? 'purple' : 'teal'));
+      .on("mouseover", function(d) {
+        div.transition()
+          .duration(200)
+          .style("opacity", .9);
+        div.html(() => {
+          let tooltip = "";
+          if (d.donationsGiven.length > 0) {
+            tooltip += "Amount Given \n";
+            d.donationsGiven.map(donation => {
+              tooltip += "\n" + donation.tokenName + " : " + donation.amount + "\n"
+
+            })
+          }
+          if (d.donationsReceived.length > 0) {
+            tooltip += "Amount Received \n";
+            d.donationsReceived.map(donation => {
+              tooltip += donation.tokenName + " : " + donation.amount + "\n"
+            })
+
+          }
+          return tooltip
+        })
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+        div.transition()
+          .duration(500)
+          .style("opacity", 0);
+      })
+      .attr('fill', d => (d.isGiver ? 'purple' : 'teal'))
+      .on("click", ((d) => {
+        div.transition()
+          .duration(500)
+          .style("opacity", 0);
+        let url = d.isGiver ? "giver" : "receiver";
+        url += "/" + d.id
+        navigate(url)
+
+      }));
 
     let nodeText = containingG
       .append('g')
