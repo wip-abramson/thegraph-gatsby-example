@@ -621,7 +621,7 @@ pre tt:after {
   }
 }
 
-.links line {
+.links polyline {
   stroke: rgba(0, 0, 0, 0.66);
   stroke-opacity: 0.6;
 }
@@ -650,4 +650,8 @@ div.tooltip {
   border: 0px;
   border-radius: 8px;
   pointer-events: none;
+}
+
+.d3-container {
+  width: 600px;
 }
