@@ -5,19 +5,28 @@ const GiverTemplate = ({data}) => {
   console.log(data);
   return <div>
     <h1>Giver of Giveth</h1>
-    <GivethDonators donations={data.giveth.donates}/>
+    <h2>Thank you for donating {data.giveth.giver.donationCount} times!</h2>
+    {/*<GivethDonators donations={data.giveth.donates}/>*/}
   </div>
 }
 
 export const giverTemplateQuery = graphql`
-query GiverQuery($uniqueId: GIVETH_BigInt!) {
+query GiverQuery($uniqueId: ID!) {
   giveth {
-    donates(where: {giverId: $uniqueId}) {
+    giver(id: $uniqueId) {
       id
-      receiverId
-      token
-      amount
-      giverId
+      donationCount
+      donations {
+        to {
+          id
+          donationCount
+        }
+        token {
+          tokenName
+        }
+        value
+        timeSent
+      }
     }
   }
 }

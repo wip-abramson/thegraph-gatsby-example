@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Default Starter`,
+    title: `The Giveth Donation Explorer`,
     description: `Kick off your next, great Gatsby project with this default starter. This barebones starter ships with the main Gatsby configuration files you might need.`,
     author: `@gatsbyjs`,
   },
@@ -35,7 +35,7 @@ module.exports = {
         // Field under which the remote schema will be accessible. You'll use this in your Gatsby query
         fieldName: "giveth",
         // Url to query from
-        url: "https://api.thegraph.com/subgraphs/name/geleeroyale/giveth-donation",
+        url: "https://api.thegraph.com/subgraphs/name/wip-abramson/giveth-donation",
 
         // refetch interval in seconds
         refetchInterval: 60,

@@ -5,19 +5,33 @@ const ReceiverTemplate = ({data}) => {
 
   return <div>
     <h1>Receiver of Giveth's Giving</h1>
-    <GivethDonators donations={data.giveth.donates}/>
+    {/*<GivethDonators donations={data.giveth.donates}/>*/}
   </div>
 }
 
 export const receiverTemplateQuery = graphql`
-query ReceiverQuery($uniqueId: GIVETH_BigInt!) {
+query ReceiverQuery($uniqueId: ID!) {
   giveth {
-    donates(where: {receiverId: $uniqueId}) {
+    
+
+    donationRecipient(id: $uniqueId) {
       id
-      receiverId
-      token
-      amount
-      giverId
+      donationCount
+      donations(first: 1000)  {
+        from {
+          id
+          donationCount
+        }
+        token {
+          tokenName
+        }
+        value
+        timeSent
+      }
+    }
+    tokens {
+      tokenName
+      totalDonated
     }
   }
 }

@@ -1,30 +1,49 @@
 import React from 'react';
 import * as d3 from "d3"
 import {navigate} from 'gatsby';
-import {ETH, DAI, DAI_TO_ETH} from "./GivethDonators"
+import {ETH, DAI, ETH_TO_DAI} from "./GivethDonators"
 
 
-const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue}) => {
+const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue, showVisualisation}) => {
   React.useEffect(() => {
     console.log('Mounted');
+
     drawChart(nodes, links, donationTotal);
   }, []);
 
-  const calculateDaiDonationsValue = (donationsArray) => {
-    let totalDaiValue = 0
-    if (donationsArray.length !== 0) {
-      totalDaiValue = donationsArray.reduce((total, donationData) => {
-        return total + getRelativeDaiValue(donationData)
-      }, 0)
-    }
-    return totalDaiValue
+
+  // const calculateDaiDonationsValue = (donationsArray) => {
+  //   let totalDaiValue = 0
+  //   if (donationsArray.length !== 0) {
+  //     totalDaiValue = donationsArray.reduce((total, donationData) => {
+  //       return total + getRelativeDaiValue(donationData)
+  //     }, 0)
+  //   }
+  //   return totalDaiValue
+  // }
+
+  // const calculateProportionDonatedRelativeToTotal = (donationData, donationTotal) => {
+  //   return donationData.tokenName === ETH ? donationData.amount * ETH_TO_DAI / donationTotal : donationData / donationTotal
+  // }
+
+  const calculateStrokeWidth = (data) => {
+
+      let daiDonated = getRelativeDaiValue(data.donation.token.tokenName, data.donation.value);
+      let proportion = daiDonated / donationTotal
+
+      const strokeWidth = proportion * 1000;
+
+      return strokeWidth > 20 ? strokeWidth : 20;
   }
 
-  const calculateProportionDonatedRelativeToTotal = (donationData, donationTotal) => {
-    return donationData.tokenName === ETH ? donationData.amount * DAI_TO_ETH / donationTotal : donationData / donationTotal
+  const calculateRadius = (data) => {
+    let proportion = data.totalDonationValue / donationTotal
+    let radius = 1000 * proportion;
+    return radius > 50 ? radius : 50;
   }
 
   const drawChart = (nodes, links, donationTotal) => {
+    console.log("DRAW CHART", nodes, links, donationTotal)
     const height = window.innerHeight;
     const width = window.innerWidth - 400;
 
@@ -43,7 +62,9 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue}
       .on('drag', dragDrag)
       .on('end', dragEnd);
 
-    let zoomHandler = d3.zoom().on('zoom', zoom_actions);
+    let zoomHandler = d3.zoom()
+      .scaleExtent([0.01, 0.2])
+      .on('zoom', zoom_actions);
 
     drag_handler(containingG);
 
@@ -51,8 +72,10 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue}
 
     const simulation = d3.forceSimulation().nodes(nodes);
 
+    console.log(simulation.nodes())
     //Create the link force
     //We need the id accessor to use named sources and targets
+
     let linkForce = d3
       .forceLink(links)
       .id(function(d) {
@@ -60,6 +83,8 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue}
       })
       .distance(1000)
       .strength(2.7);
+
+    console.log("LINK FORCE LINKS", linkForce.links())
 
     let chargeForce = d3
       .forceManyBody()
@@ -80,7 +105,7 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue}
       .call(zoomHandler)
       .call(
         zoomHandler.transform,
-        d3.zoomIdentity.translate(width / 2, height / 2).scale(0.15, 0.15)
+        d3.zoomIdentity.translate(width / 2, height / 2).scale(0.05, 0.05)
       )
       .selectAll('marker')
       .data(['mid']) // Different link/path types can be defined here
@@ -92,7 +117,7 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue}
       .attr('refY', 0)
       .attr('markerWidth', 500)
       .attr('markerHeight', 30)
-      .attr('markerUnits', 'px')
+      .attr('markerUnits', 'userSpaceOnUse')
       .attr('orient', 'auto')
       .append('svg:path')
       .attr('d', 'M0,-5L10,0L0,5');
@@ -110,27 +135,33 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue}
       .data(links)
       .enter()
       .append('polyline')
-      .attr('stroke-width', function(d) {
-        let daiDonated = getRelativeDaiValue(d.donationData);
-        let proportion = daiDonated / donationTotal
-
-        const strokeWidth = proportion * 200;
-
-        return strokeWidth > 10 ? strokeWidth : 10;
+      .attr('stroke-width', (d) => {
+        return calculateStrokeWidth(d)
       })
-      .attr('fill', 'blue')
       .on("mouseover", function(d) {
+        d3.select(this)
+          .style("stroke-opacity", 1.0)
+          .attr('stroke-width', function(d) {
+            return calculateStrokeWidth(d) * 2
+          })
+
         div.transition()
           .duration(200)
           .style("opacity", .9);
-        div.html(d.donationData.amount + " " + d.donationData.tokenName)
+        div.html((Math.round(d.donation.value * 10000) / 10000) + " " + d.donation.token.tokenName)
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY - 28) + "px");
       })
       .on("mouseout", function(d) {
+        d3.select(this)
+          .style("stroke-opacity", 0.6)
+          .attr('stroke-width', function(d) {
+            return calculateStrokeWidth(d)
+          })
         div.transition()
           .duration(500)
           .style("opacity", 0);
+
       })
       .attr('marker-mid', 'url(#mid)');
 
@@ -165,37 +196,32 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue}
       .attr('r', d => {
         // console.log(donationTotal)
         // console.log(d.amount / 10**18 )
-        let daiDonatedAndReceived = calculateDaiDonationsValue(d.donationsGiven) + calculateDaiDonationsValue(d.donationsReceived)
-        let proportion = daiDonatedAndReceived / donationTotal
-
-        return 20 + 500 * proportion;
+        return calculateRadius(d)
       })
       .on("mouseover", function(d) {
+        d3.select(this)
+          .style("cursor", "pointer")
+          .attr('r', (d) => {
+          return calculateRadius(d) * 1.5
+        })
         div.transition()
           .duration(200)
           .style("opacity", .9);
         div.html(() => {
           let tooltip = "";
-          if (d.donationsGiven.length > 0) {
-            tooltip += "Amount Given \n";
-            d.donationsGiven.map(donation => {
-              tooltip += "\n" + donation.tokenName + " : " + donation.amount + "\n"
+          tooltip += (Math.round(d.totalDonationValue * 10000) / 10000) + " DAI"
 
-            })
-          }
-          if (d.donationsReceived.length > 0) {
-            tooltip += "Amount Received \n";
-            d.donationsReceived.map(donation => {
-              tooltip += donation.tokenName + " : " + donation.amount + "\n"
-            })
-
-          }
           return tooltip
         })
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY - 28) + "px");
       })
       .on("mouseout", function(d) {
+        d3.select(this)
+          .style("cursor", "default")
+          .attr('r', (d) => {
+          return calculateRadius(d)
+        })
         div.transition()
           .duration(500)
           .style("opacity", 0);
@@ -226,7 +252,7 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue}
         return d.y;
       })
       .text(function(d) {
-        return d.id;
+        return "Node";
       })
       .attr('font-family', 'sans-serif')
       .attr('font-size', '10px')
@@ -292,7 +318,7 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue}
   };
 
 
-  return <div id="d3-container"/>;
+  return <div id="d3-container" style={{display: showVisualisation ? "block" : "none"}}/>;
 
 }
 

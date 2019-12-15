@@ -9,8 +9,14 @@ import GivethDonators from "../components/Visualisation/GivethDonators"
 const IndexPage = ({data}) => (
   <Layout>
     <SEO title="Home" />
-    <h1>The Giveth Giving Data Visualisation</h1>
-    <GivethDonators donations={data.giveth.donates} />
+    {
+      data.giveth.tokens.map(token => {
+        return <h2>Total {token.tokenName} donated - {token.totalDonated}</h2>
+      })
+    }
+    <h2>From a total of {data.giveth.donations.length} Donations </h2>
+
+    <GivethDonators givethData={data.giveth} />
   </Layout>
 )
 
@@ -18,12 +24,43 @@ export const allGivethDonations = graphql`
 query MyQuery {
 
   giveth {
-    donates(first: 1000) {
+    givers(first: 1000) {
       id
-      giverId
-      receiverId
-      token
-      amount
+      donationCount
+      donations  {
+        token {
+          tokenName
+        }
+        value
+      }
+    }
+    donations(first: 1000)  {
+      id
+      to {
+        id
+      }
+      from {
+        id
+      }
+      token {
+        tokenName
+      }
+      value
+      timeSent
+    }
+    donationRecipients(first: 1000) {
+      id
+      donationCount
+      donations  {
+        token {
+          tokenName
+        }
+        value
+      }
+    }
+    tokens {
+      tokenName
+      totalDonated
     }
   }
 }

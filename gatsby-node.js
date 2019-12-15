@@ -17,14 +17,14 @@ exports.createPages = ({ graphql, actions }) => {
   // products, portfolio items, landing pages, etc.
   // Variables can be added as the second function parameter
   return graphql(`
-    query allDonations {
+    query allGivers {
        giveth {
-        donates(first: 1000) {
+        givers(first: 1000) {
           id
-          giverId
-          receiverId
-          token
-          amount
+          
+        }
+        donationRecipients(first: 1000) {
+          id
         }
       }
     }
@@ -35,32 +35,23 @@ exports.createPages = ({ graphql, actions }) => {
     let uniqueGivers = [];
     let uniqueReceivers = [];
     console.log(result.data);
-    result.data.giveth.donates.map(donation => {
-      if (!uniqueGivers.includes(donation.giverId)) {
-        uniqueGivers.push(donation.giverId);
-      }
-      if (!uniqueReceivers.includes(donation.receiverId)) {
-        uniqueReceivers.push(donation.receiverId)
-      }
-    })
-    uniqueGivers.map(id => {
+    result.data.giveth.givers.map(giver => {
       createPage({
-        path: "giver" + "/" + id,
+        path: "giver" + "/" + giver.id,
         component: giverTemplate,
         context: {
-          uniqueId: id
+          uniqueId: giver.id
         }
       })
     })
-    uniqueReceivers.map(id => {
+    result.data.giveth.donationRecipients.map(receiver => {
       createPage({
-        path: "receiver" + "/" + id,
+        path: "receiver" + "/" + receiver.id,
         component: receiverTemplate,
         context: {
-          uniqueId: id
+          uniqueId: receiver.id
         }
       })
     })
-
   })
 }
