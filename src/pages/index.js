@@ -15,7 +15,8 @@ const IndexPage = ({data}) => (
       })
     }
     <h2>From a total of {data.giveth.donations.length} Donations </h2>
-
+    <h2>{data.giveth.givers.length} Unique Giver addresses</h2>
+    <h2>{data.giveth.donationRecipients.length} Donation Recipients</h2>
     <GivethDonators givethData={data.giveth} />
   </Layout>
 )

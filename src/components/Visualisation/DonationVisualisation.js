@@ -33,13 +33,13 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue,
 
       const strokeWidth = proportion * 1000;
 
-      return strokeWidth > 20 ? strokeWidth : 20;
+      return 10 + strokeWidth;
   }
 
   const calculateRadius = (data) => {
     let proportion = data.totalDonationValue / donationTotal
-    let radius = 1000 * proportion;
-    return radius > 50 ? radius : 50;
+    let radius = 1500 * proportion;
+    return 50 + radius
   }
 
   const drawChart = (nodes, links, donationTotal) => {
@@ -84,7 +84,6 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue,
       .distance(1000)
       .strength(2.7);
 
-    console.log("LINK FORCE LINKS", linkForce.links())
 
     let chargeForce = d3
       .forceManyBody()
@@ -115,9 +114,9 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue,
       .attr('viewBox', '0 -5 10 10')
       .attr('refX', -20)
       .attr('refY', 0)
-      .attr('markerWidth', 500)
-      .attr('markerHeight', 30)
-      .attr('markerUnits', 'userSpaceOnUse')
+      .attr('markerWidth', 2)
+      .attr('markerHeight', 1)
+      .attr('markerUnits', 'strokeWidth')
       .attr('orient', 'auto')
       .append('svg:path')
       .attr('d', 'M0,-5L10,0L0,5');
@@ -209,7 +208,7 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue,
           .style("opacity", .9);
         div.html(() => {
           let tooltip = "";
-          tooltip += (Math.round(d.totalDonationValue * 10000) / 10000) + " DAI"
+          tooltip += "<div>" + (Math.round(d.totalDonationValue * 10000) / 10000) + " Dollars " + (d.isGiver ? "Donated" : "Received") +" <br/> Over " + d.donationCount + " Donations </div>"
 
           return tooltip
         })
