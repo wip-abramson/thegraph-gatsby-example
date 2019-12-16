@@ -45,7 +45,7 @@ const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue,
   const drawChart = (nodes, links, donationTotal) => {
     console.log("DRAW CHART", nodes, links, donationTotal)
     const height = window.innerHeight;
-    const width = window.innerWidth - 400;
+    const width = window.innerWidth - 100 > 800 ? 800 : window.innerWidth - 100 ;
 
 
     const svg = d3
