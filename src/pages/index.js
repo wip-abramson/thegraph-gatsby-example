@@ -4,7 +4,7 @@ import { Link } from "gatsby"
 import Layout from "../components/layout"
 import Image from "../components/image"
 import SEO from "../components/seo"
-import GivethDonators from "../components/Visualisation/GivethDonators"
+import FullGivethDonations from "../components/Visualisation/FullGivethDonations"
 
 const IndexPage = ({data}) => (
   <Layout>
@@ -17,7 +17,7 @@ const IndexPage = ({data}) => (
     <h2>From a total of {data.giveth.donations.length} Donations </h2>
     <h2>{data.giveth.givers.length} Unique Giver addresses</h2>
     <h2>{data.giveth.donationRecipients.length} Donation Recipients</h2>
-    <GivethDonators givethData={data.giveth} />
+    <FullGivethDonations givethData={data.giveth} />
   </Layout>
 )
 

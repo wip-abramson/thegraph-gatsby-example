@@ -1,12 +1,17 @@
 import React from 'react';
-import GivethDonators from "../components/Visualisation/GivethDonators"
+import FullGivethDonations from "../components/Visualisation/FullGivethDonations"
+import FocusedGivethDonations from "../components/Visualisation/FocusedGivethDonations"
+import Layout from "../components/layout"
 
 const ReceiverTemplate = ({data}) => {
 
-  return <div>
-    <h1>Receiver of Giveth's Giving</h1>
-    {/*<GivethDonators donations={data.giveth.donates}/>*/}
-  </div>
+  return <Layout>
+    <div>
+      <h1>Receiver of Giveth's Giving</h1>
+      <h2>Thank you for donating {data.giveth.donationRecipient.donationCount} times!</h2>
+      <FocusedGivethDonations isGiver={false} focusedNode={data.giveth.donationRecipient}/>
+    </div>
+    </Layout>
 }
 
 export const receiverTemplateQuery = graphql`
@@ -17,10 +22,12 @@ query ReceiverQuery($uniqueId: ID!) {
     donationRecipient(id: $uniqueId) {
       id
       donationCount
-      donations(first: 1000)  {
+      donations  {
         from {
           id
-          donationCount
+        }
+        to {
+          id
         }
         token {
           tokenName
@@ -28,10 +35,6 @@ query ReceiverQuery($uniqueId: ID!) {
         value
         timeSent
       }
-    }
-    tokens {
-      tokenName
-      totalDonated
     }
   }
 }

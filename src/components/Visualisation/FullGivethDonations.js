@@ -5,7 +5,7 @@ export const DAI = "DAI";
 export const ETH = "ETH";
 export const ETH_TO_DAI = 150;
 
-const GivethDonators = ({ givethData }) => {
+const FullGivethDonations = ({ givethData }) => {
   let [nodes, setNodes] = React.useState(null);
   let [links, setLinks] = React.useState(null);
   let [showVis, setShowVis] = React.useState(false);
@@ -89,4 +89,4 @@ const GivethDonators = ({ givethData }) => {
   return <div/>
 };
 
-export default GivethDonators;
+export default FullGivethDonations;
