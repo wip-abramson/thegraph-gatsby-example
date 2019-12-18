@@ -1,10 +1,10 @@
 import React from 'react';
 import * as d3 from "d3"
 import {navigate} from 'gatsby';
-import {ETH, DAI, ETH_TO_DAI} from "./FullGivethDonations"
+import { getRelativeDaiValue } from "../../utils/visualisationFunctions"
 
 
-const DonationVisualisation =({nodes, links, donationTotal, getRelativeDaiValue, showVisualisation}) => {
+const DonationVisualisation =({nodes, links, donationTotal, showVisualisation}) => {
   React.useEffect(() => {
     console.log('Mounted');
 

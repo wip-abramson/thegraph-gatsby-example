@@ -1,7 +1,8 @@
 import React from 'react';
 import * as d3 from "d3"
+import {navigate} from 'gatsby';
 
-const FocusedGivethDonations = ({focusedNode, isGiver}) => {
+const FocusedGivethDonations = ({focusedNode, isGiver, colorMap}) => {
   let [nodes, setNodes] = React.useState(null);
   let [links, setLinks] = React.useState(null);
   let [showVis, setShowVis] = React.useState(false);
@@ -10,7 +11,7 @@ const FocusedGivethDonations = ({focusedNode, isGiver}) => {
     let giverAndReceivers = []
     let visLinks = []
 
-
+    console.log("THE MAP", colorMap)
     giverAndReceivers.push({
       id: focusedNode.id,
       isGiver: isGiver
@@ -52,10 +53,10 @@ const FocusedGivethDonations = ({focusedNode, isGiver}) => {
     setNodes(giverAndReceivers);
     setLinks(visLinks);
 
-    drawChart(giverAndReceivers, visLinks)
+    drawChart(giverAndReceivers, visLinks, colorMap)
   }, [])
 
-  const drawChart = (nodes, links) => {
+  const drawChart = (nodes, links, colorMap) => {
     console.log("DRAW CHART", nodes, links)
     const height = 400;
     const width = 400;
@@ -212,43 +213,47 @@ const FocusedGivethDonations = ({focusedNode, isGiver}) => {
         // console.log(d.amount / 10**18 )
         return d.isGiver === isGiver ? 150 : 50
       })
-      // .on("mouseover", function(d) {
-      //   d3.select(this)
-      //     .style("cursor", "pointer")
-      //     .attr('r', (d) => {
-      //       return 75
-      //     })
-      //   div.transition()
-      //     .duration(200)
-      //     .style("opacity", .9);
-      //   div.html(() => {
-      //     let tooltip = "";
-      //     tooltip += "<div>" + (Math.round(d.totalDonationValue * 10000) / 10000) + " Dollars " + (d.isGiver ? "Donated" : "Received") +" <br/> Over " + d.donationCount + " Donations </div>"
-      //     return tooltip
-      //   })
-      //     .style("left", (d3.event.pageX) + "px")
-      //     .style("top", (d3.event.pageY - 28) + "px");
-      // })
-      // .on("mouseout", function(d) {
-      //   d3.select(this)
-      //     .style("cursor", "default")
-      //     .attr('r', (d) => {
-      //       return 50
-      //     })
-      //   div.transition()
-      //     .duration(500)
-      //     .style("opacity", 0);
-      // })
-      .attr('fill', d => (d.isGiver ? 'purple' : 'teal'))
-      // .on("click", ((d) => {
-      //   div.transition()
-      //     .duration(500)
-      //     .style("opacity", 0);
-      //   let url = d.isGiver ? "giver" : "receiver";
-      //   url += "/" + d.id
-      //   // navigate(url)
-      //
-      // })
+      .attr('fill', d => {
+        return (d.isGiver ? 'purple' : 'teal')
+        // if (d.isGiver === isGiver) {
+        //   return (d.isGiver ? 'purple' : 'teal')
+        // } else {
+        //   console.log("COLOR MAP and ID", colorMap, d.id)
+        //   return colorMap[d.id]
+        // }
+      })
+      .on("mouseover", function(d) {
+        if (d.isGiver !== isGiver) {
+          d3.select(this)
+            .style("cursor", "pointer")
+            .attr('r', 75)
+        }
+
+        // div.transition()
+        //   .duration(200)
+        //   .style("opacity", .9);
+        // div.html(() => {
+        //   let tooltip = "";
+        //   tooltip += "<div>" + (Math.round(d.totalDonationValue * 10000) / 10000) + " Dollars " + (d.isGiver ? "Donated" : "Received") +" <br/> Over " + d.donationCount + " Donations </div>"
+        //
+        //   return tooltip
+        // })
+        //   .style("left", (d3.event.pageX) + "px")
+        //   .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+        if (d.isGiver !== isGiver) {
+          d3.select(this)
+            .style("cursor", "pointer")
+            .attr('r', 50)
+        }
+      })
+      .on("click", ((d) => {
+        let url = d.isGiver ? "giver" : "receiver";
+        url += "/" + d.id
+        navigate(url)
+
+      }))
 
     let nodeText = containingG
       .append('g')

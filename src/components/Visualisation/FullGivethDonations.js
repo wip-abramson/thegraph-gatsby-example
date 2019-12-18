@@ -1,9 +1,6 @@
 import React from 'react';
 import DonationVisualisation from "./DonationVisualisation"
-
-export const DAI = "DAI";
-export const ETH = "ETH";
-export const ETH_TO_DAI = 150;
+import { getRelativeDaiValue } from "../../utils/visualisationFunctions"
 
 const FullGivethDonations = ({ givethData }) => {
   let [nodes, setNodes] = React.useState(null);
@@ -73,17 +70,13 @@ const FullGivethDonations = ({ givethData }) => {
   }
 
 
-  const getRelativeDaiValue = (tokenName, tokenValue) => {
 
-    return tokenName === ETH ? tokenValue * ETH_TO_DAI : parseFloat(tokenValue)
-
-  }
 
 
   if (nodes && links) {
     return <div>
       <button onClick={() => setShowVis(true)}>Explore Giveth Donation Network</button>
-      <DonationVisualisation showVisualisation={showVis} nodes={nodes} links={links} donationTotal={totalDaiDonated} getRelativeDaiValue={getRelativeDaiValue}/>
+      <DonationVisualisation showVisualisation={showVis} nodes={nodes} links={links} donationTotal={totalDaiDonated} />
     </div>
   }
   return <div/>
