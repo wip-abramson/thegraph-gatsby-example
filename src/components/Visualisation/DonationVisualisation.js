@@ -63,7 +63,7 @@ const DonationVisualisation =({nodes, links, donationTotal, showVisualisation}) 
       .on('end', dragEnd);
 
     let zoomHandler = d3.zoom()
-      .scaleExtent([0.01, 0.2])
+      .scaleExtent([0.01, 0.15])
       .on('zoom', zoom_actions);
 
     drag_handler(containingG);
@@ -114,8 +114,8 @@ const DonationVisualisation =({nodes, links, donationTotal, showVisualisation}) 
       .attr('viewBox', '0 -5 10 10')
       .attr('refX', -20)
       .attr('refY', 0)
-      .attr('markerWidth', 2)
-      .attr('markerHeight', 1)
+      .attr('markerWidth', 3)
+      .attr('markerHeight', 3)
       .attr('markerUnits', 'strokeWidth')
       .attr('orient', 'auto')
       .append('svg:path')

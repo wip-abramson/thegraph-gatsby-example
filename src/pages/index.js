@@ -11,7 +11,7 @@ const IndexPage = ({data}) => (
     <SEO title="Home" />
     {
       data.giveth.tokens.map(token => {
-        return <h2>Total {token.tokenName} donated - {token.totalDonated}</h2>
+        return <h2>Total {token.tokenName} donated - {Math.round(token.totalDonated)}</h2>
       })
     }
     <h2>From a total of {data.giveth.donations.length} Donations </h2>
