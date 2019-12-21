@@ -2,7 +2,7 @@ import React from 'react';
 import * as d3 from 'd3';
 import { ETH, getRelativeDaiValue } from "../../utils/visualisationFunctions"
 
-const DonationsOverTime = ({donations, isGiver, totalDonationsValue, getColor}) => {
+const DonationsOverTime = ({donations, isGiver, totalDonationsValue, colorMap}) => {
 
   React.useEffect(() => {
     drawChart();
@@ -97,7 +97,7 @@ const DonationsOverTime = ({donations, isGiver, totalDonationsValue, getColor}) 
       .attr("class", "dot") // Assign a class for styling
       .attr("cx", function(d) {
       return xScale(d.time) })
-      .attr("fill", d => "red")
+      .attr("fill", d => colorMap[d.otherPartyId])
       .attr("cy", function(d) { return yScale(d.cumulativeDollarValue) })
       .attr("r", 5)
       .on("mouseover", function(d) {

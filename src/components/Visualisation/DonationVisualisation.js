@@ -112,7 +112,7 @@ const DonationVisualisation =({nodes, links, donationTotal, showVisualisation}) 
       .append('svg:marker') // This section adds in the arrows
       .attr('id', String)
       .attr('viewBox', '0 -5 10 10')
-      .attr('refX', -20)
+      .attr('refX', 0)
       .attr('refY', 0)
       .attr('markerWidth', 3)
       .attr('markerHeight', 3)

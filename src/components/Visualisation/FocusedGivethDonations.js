@@ -214,13 +214,13 @@ const FocusedGivethDonations = ({focusedNode, isGiver, colorMap}) => {
         return d.isGiver === isGiver ? 150 : 50
       })
       .attr('fill', d => {
-        return (d.isGiver ? 'purple' : 'teal')
-        // if (d.isGiver === isGiver) {
-        //   return (d.isGiver ? 'purple' : 'teal')
-        // } else {
-        //   console.log("COLOR MAP and ID", colorMap, d.id)
-        //   return colorMap[d.id]
-        // }
+        // return (d.isGiver ? 'purple' : 'teal')
+        if (d.isGiver === isGiver) {
+          return (d.isGiver ? 'purple' : 'teal')
+        } else {
+          console.log("COLOR MAP and ID", colorMap, d.id)
+          return colorMap[d.id]
+        }
       })
       .on("mouseover", function(d) {
         if (d.isGiver !== isGiver) {

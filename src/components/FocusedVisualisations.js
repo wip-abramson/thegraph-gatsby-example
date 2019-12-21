@@ -10,25 +10,25 @@ const FocusedVisualisations = ({node, isGiver}) => {
     return total += getRelativeDaiValue(d.token.tokenName, d.value)
   }, 0)
 
-  const [showVis, setShowVis] = React.useState(false)
+  const [colorMap, setColorMap] = React.useState(false)
 
-  let colorMap = {};
+
 
   React.useEffect(() => {
     console.log("POPULATE COLORS")
+    let map = {};
     node.donations.map(donation => {
-      isGiver ? getColor(donation.to.id) : getColor(donation.from.id)
+      isGiver ? getColor(map, donation.to.id) : getColor(map, donation.from.id)
     })
-    setShowVis(true)
+    setColorMap(map)
   }, [node, isGiver])
 
-  const getColor = (nodeId) => {
+  const getColor = (map, nodeId) => {
     console.log("GET COLOR FOR", nodeId)
-    console.log("EXISTING MAP", colorMap)
-    if (!colorMap[nodeId]) {
+    if (!map[nodeId]) {
       let newColor = getRandomColor();
 
-      colorMap[nodeId] = newColor
+      map[nodeId] = newColor
 
     }
   }
@@ -46,10 +46,10 @@ const FocusedVisualisations = ({node, isGiver}) => {
   return (
     <div>
       <h2>A total of {Math.round(summedDonations)} dollars!</h2>
-      {showVis && (
+      {colorMap && (
         <div>
           <FocusedGivethDonations colorMap={colorMap} focusedNode={node} isGiver={isGiver}/>
-          <DonationsOverTime showVis={showVis} colorMap={colorMap} donations={node.donations} isGiver={isGiver} totalDonationsValue={summedDonations}/>
+          <DonationsOverTime colorMap={colorMap} donations={node.donations} isGiver={isGiver} totalDonationsValue={summedDonations}/>
         </div>
       )
 
