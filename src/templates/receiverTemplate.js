@@ -14,9 +14,9 @@ const ReceiverTemplate = ({data}) => {
 
 
   return <Layout>
-    <div>
-      <h1>Receiver of Giveth's Giving</h1>
-      <h2>This has received {data.giveth.donationRecipient.donationCount} donations!</h2>
+    <div className="box">
+      <h1 className="title">Receiver of Giveth's Giving</h1>
+      <h2 className="subtitle">This has received {data.giveth.donationRecipient.donationCount} donations!</h2>
       <FocusedVisualisations isGiver={false} node={data.giveth.donationRecipient}/>
     </div>
     </Layout>

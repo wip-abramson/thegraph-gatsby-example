@@ -45,7 +45,7 @@ const FocusedVisualisations = ({node, isGiver}) => {
 
   return (
     <div>
-      <h2>A total of {Math.round(summedDonations)} dollars!</h2>
+      <h2 className="subtitle">A total of {Math.round(summedDonations)} dollars!</h2>
       {colorMap && (
         <div>
           <FocusedGivethDonations colorMap={colorMap} focusedNode={node} isGiver={isGiver}/>

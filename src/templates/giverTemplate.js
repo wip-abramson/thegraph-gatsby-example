@@ -15,9 +15,9 @@ const GiverTemplate = ({data}) => {
 
 
   return <Layout>
-    <div>
-      <h1>Giver of Giveth</h1>
-      <h2>Thank you for donating {data.giveth.giver.donationCount} times!</h2>
+    <div className="box">
+      <h1 className="title">Giver of Giveth</h1>
+      <h2 className="subtitle">Thank you for donating {data.giveth.giver.donationCount} times!</h2>
       <FocusedVisualisations isGiver={true} node={data.giveth.giver}/>
 
     </div>

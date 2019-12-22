@@ -74,8 +74,8 @@ const FullGivethDonations = ({ givethData }) => {
 
 
   if (nodes && links) {
-    return <div>
-      <button onClick={() => setShowVis(true)}>Explore Giveth Donation Network</button>
+    return <div className="container is-spaced">
+      <button className="button is-primary" onClick={() => setShowVis(true)}>Explore Giveth Donation Network</button>
       <DonationVisualisation showVisualisation={showVis} nodes={nodes} links={links} donationTotal={totalDaiDonated} />
     </div>
   }

@@ -9,15 +9,24 @@ import FullGivethDonations from "../components/Visualisation/FullGivethDonations
 const IndexPage = ({data}) => (
   <Layout>
     <SEO title="Home" />
-    {
-      data.giveth.tokens.map(token => {
-        return <h2>Total {token.tokenName} donated - {Math.round(token.totalDonated)}</h2>
-      })
-    }
-    <h2>From a total of {data.giveth.donations.length} Donations </h2>
-    <h2>{data.giveth.givers.length} Unique Giver addresses</h2>
-    <h2>{data.giveth.donationRecipients.length} Donation Recipients</h2>
-    <FullGivethDonations givethData={data.giveth} />
+    <div className="box">
+      <h2 className="title">Giveth Donation Stats:</h2>
+      <h2>{data.giveth.donations.length} Donations </h2>
+
+      {
+        data.giveth.tokens.map(token => {
+          return <h3>{Math.round(token.totalDonated)} {token.tokenName}</h3>
+        })
+      }
+      <hr/>
+      <h2>{data.giveth.givers.length} Unique Giver addresses</h2>
+      <h2>{data.giveth.donationRecipients.length} Donation Recipients</h2>
+      <hr/>
+      <FullGivethDonations givethData={data.giveth} />
+
+    </div>
+
+
   </Layout>
 )
 

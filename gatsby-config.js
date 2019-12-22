@@ -1,8 +1,8 @@
 module.exports = {
   siteMetadata: {
     title: `The Giveth Donation Explorer`,
-    description: `Kick off your next, great Gatsby project with this default starter. This barebones starter ships with the main Gatsby configuration files you might need.`,
-    author: `@gatsbyjs`,
+    description: `A visualisation tool to explore donations within the Giveth community.`,
+    author: `@wip-abramson`,
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
@@ -41,8 +41,9 @@ module.exports = {
         refetchInterval: 60,
       },
     },
+    `gatsby-plugin-sass`,
     // this (optional) plugin enables Progressive Web App + Offline functionality
     // To learn more, visit: https://gatsby.dev/offline
-    // `gatsby-plugin-offline`,
+    `gatsby-plugin-offline`,
   ],
 }
